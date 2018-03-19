@@ -85,7 +85,7 @@ func (s *SmartContract) initLedger(stub shim.ChaincodeStubInterface, args []stri
 	if err != nil {
 		return shim.Error(err.Error())
 	}
-	fmt.Printf("Added %s \n", string(tokenAsBytes))
+	fmt.Printf("Init %s \n", string(tokenAsBytes))
 	
 	return shim.Success(nil)
 }
