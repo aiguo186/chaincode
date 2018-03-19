@@ -1,7 +1,6 @@
-package token
+package main 
 
 import (
-	"bytes"
 	"encoding/json"
 	"fmt"
 	"strconv"
@@ -15,43 +14,43 @@ type SmartContract struct {
 }
 
 type Token struct {
-	Owner			string	`json:"Owner"`
-	TotalSupply 	uint	`json:"TotalSupply"`
-	TokenName 		string	`json:"TokenName"`
+	Owner		string	`json:"Owner"`
+	TotalSupply 	int	`json:"TotalSupply"`
+	TokenName 	string	`json:"TokenName"`
 	TokenSymbol 	string	`json:"TokenSymbol"`
-	BalanceOf		map[string]uint	`json:"BalanceOf"`
+	BalanceOf	map[string]int	`json:"BalanceOf"`
 }
 
 func (token *Token) initialSupply(){
 	token.BalanceOf[token.Owner] = token.TotalSupply;
 }
 
-func (token *Token) transfer (_from string, _to string, _value uint){
+func (token *Token) transfer (_from string, _to string, _value int){
 	if(token.BalanceOf[_from] >= _value){
 		token.BalanceOf[_from] -= _value;
 		token.BalanceOf[_to] += _value;
 	}
 }
 
-func (token *Token) balance (_from string) uint{
+func (token *Token) balance (_from string) int{
 	return token.BalanceOf[_from]
 }
 
-func (token *Token) burn(_value uint) {
+func (token *Token) burn(_value int) {
 	if(token.BalanceOf[token.Owner] >= _value){
 		token.BalanceOf[token.Owner] -= _value;
 		token.TotalSupply -= _value;
 	}
 }
 
-func (token *Token) burnFrom(_from string, _value uint) {
+func (token *Token) burnFrom(_from string, _value int) {
 	if(token.BalanceOf[_from] >= _value){
 		token.BalanceOf[_from] -= _value;
 		token.TotalSupply -= _value;
 	}
 }
 
-func (token *Token) mint(_value uint) {
+func (token *Token) mint(_value int) {
 	
 	token.BalanceOf[token.Owner] += _value;
 	token.TotalSupply += _value;
@@ -62,14 +61,22 @@ func (s *SmartContract) Init(stub shim.ChaincodeStubInterface) sc.Response {
 	return shim.Success(nil)
 }
 
-func (s *SmartContract) initLedger(stub shim.ChaincodeStubInterface) sc.Response {
+func (s *SmartContract) initLedger(stub shim.ChaincodeStubInterface, args []string) sc.Response {
 	
+	if len(args) != 3 {
+                return shim.Error("Incorrect number of arguments. Expecting 2")
+        }
+
+	symbol:= args[0]
+	name  := args[1]
+	supply,_:= strconv.Atoi(args[2])
+
 	token := &Token{
-		Owner: "netkiller",
-		TotalSupply: 10000,
-		TokenName: "代币通正",
-		TokenSymbol: "COIN",
-		BalanceOf: map[string]uint{}}
+		Owner: "coinbase",
+		TotalSupply: supply,
+		TokenName: name,
+		TokenSymbol: symbol,
+		BalanceOf: map[string]int{}}
 	
 	token.initialSupply()
 
@@ -85,12 +92,18 @@ func (s *SmartContract) transferToken(stub shim.ChaincodeStubInterface, args []s
 	if len(args) != 3 {
 		return shim.Error("Incorrect number of arguments. Expecting 2")
 	}
+	_from 	:= args[1]
+	_to	:= args[2]
+	_amount,_	:= strconv.Atoi(args[3])
+	if(_amount <= 0){
+		return shim.Error("Incorrect number of amount")
+	}
 
 	tokenAsBytes, _ := stub.GetState(args[0])
 	token := Token{}
 
 	json.Unmarshal(tokenAsBytes, &token)
-	token.transfer(args[1],args[2],args[3])
+	token.transfer(_from, _to, _amount)
 
 	tokenAsBytes, _ = json.Marshal(token)
 	stub.PutState(args[0], tokenAsBytes)
@@ -109,8 +122,11 @@ func (s *SmartContract) balanceToken(stub shim.ChaincodeStubInterface, args []st
 
 	json.Unmarshal(tokenAsBytes, &token)
 	amount := token.balance(args[1])
+	value := strconv.Itoa(amount)
 
-	return shim.Success(amount)
+	jsonVal, _ := json.Marshal(string(value))
+
+	return shim.Success(jsonVal)
 }
 
 func (s *SmartContract) Invoke(stub shim.ChaincodeStubInterface) sc.Response {
@@ -121,7 +137,7 @@ func (s *SmartContract) Invoke(stub shim.ChaincodeStubInterface) sc.Response {
 	if function == "balanceToken" {
 		return s.balanceToken(stub, args)
 	} else if function == "initLedger" {
-		return s.initLedger(stub)
+		return s.initLedger(stub, args)
 	} else if function == "transferToken" {
 		return s.transferToken(stub, args)
 	}
