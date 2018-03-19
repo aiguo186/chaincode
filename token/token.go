@@ -81,16 +81,19 @@ func (s *SmartContract) initLedger(stub shim.ChaincodeStubInterface, args []stri
 	token.initialSupply()
 
 	tokenAsBytes, _ := json.Marshal(token)
-	stub.PutState("Token", tokenAsBytes)
-	fmt.Println("Added", tokenAsBytes)
+	err := stub.PutState(symbol, tokenAsBytes)
+	if err != nil {
+		return shim.Error(err.Error())
+	}
+	fmt.Printf("Added %s \n", string(tokenAsBytes))
 	
 	return shim.Success(nil)
 }
 
 func (s *SmartContract) transferToken(stub shim.ChaincodeStubInterface, args []string) sc.Response {
 
-	if len(args) != 3 {
-		return shim.Error("Incorrect number of arguments. Expecting 2")
+	if len(args) != 4 {
+		return shim.Error("Incorrect number of arguments. Expecting 4")
 	}
 	_from 	:= args[1]
 	_to	:= args[2]
@@ -99,34 +102,49 @@ func (s *SmartContract) transferToken(stub shim.ChaincodeStubInterface, args []s
 		return shim.Error("Incorrect number of amount")
 	}
 
-	tokenAsBytes, _ := stub.GetState(args[0])
+	tokenAsBytes,err := stub.GetState(args[0])
+	if err != nil {
+		return shim.Error(err.Error())
+	}
+	fmt.Printf("transferToken - begin %s \n", string(tokenAsBytes))
+
 	token := Token{}
 
 	json.Unmarshal(tokenAsBytes, &token)
 	token.transfer(_from, _to, _amount)
 
-	tokenAsBytes, _ = json.Marshal(token)
-	stub.PutState(args[0], tokenAsBytes)
+	tokenAsBytes, err = json.Marshal(token)
+	if err != nil {
+		return shim.Error(err.Error())
+	}
+	err = stub.PutState(args[0], tokenAsBytes)
+	if err != nil {
+		return shim.Error(err.Error())
+	}
+	fmt.Printf("transferToken - end %s \n", string(tokenAsBytes))
 
 	return shim.Success(nil)
 }
 
 func (s *SmartContract) balanceToken(stub shim.ChaincodeStubInterface, args []string) sc.Response {
 
-	if len(args) != 1 {
-		return shim.Error("Incorrect number of arguments. Expecting 1")
+	if len(args) != 2 {
+		return shim.Error("Incorrect number of arguments. Expecting 2")
 	}
 
-	tokenAsBytes, _ := stub.GetState(args[0])
+	tokenAsBytes,err := stub.GetState(args[0])
+	if err != nil {
+		return shim.Error(err.Error())
+	}
 	token := Token{}
 
 	json.Unmarshal(tokenAsBytes, &token)
 	amount := token.balance(args[1])
 	value := strconv.Itoa(amount)
+	fmt.Printf("%s balance is %s \n", args[1], value)	
+	//jsonVal, _ := json.Marshal(string(value))
 
-	jsonVal, _ := json.Marshal(string(value))
-
-	return shim.Success(jsonVal)
+	return shim.Success([]byte(value))
 }
 
 func (s *SmartContract) Invoke(stub shim.ChaincodeStubInterface) sc.Response {
