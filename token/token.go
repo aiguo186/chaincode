@@ -36,7 +36,8 @@ func (token *Token) initialSupply(){
 }
 
 func (token *Token) transfer (_from string, _to string, _value int){
-	if(token) return
+	if(token.Lock) return
+	if(token.FrozenAccount[_from] || token.FrozenAccount[_to]) return
 	if(token.BalanceOf[_from] >= _value){
 		token.BalanceOf[_from] -= _value;
 		token.BalanceOf[_to] += _value;
@@ -48,7 +49,7 @@ func (token *Token) balance (_from string) int{
 }
 
 func (token *Token) burn(_value int) {
-	if(token) return
+	if(token.Lock) return
 	if(token.BalanceOf[token.Owner] >= _value){
 		token.BalanceOf[token.Owner] -= _value;
 		token.TotalSupply -= _value;
@@ -56,7 +57,7 @@ func (token *Token) burn(_value int) {
 }
 
 func (token *Token) burnFrom(_from string, _value int) {
-	if(token) return
+	if(token.Lock) return
 	if(token.BalanceOf[_from] >= _value){
 		token.BalanceOf[_from] -= _value;
 		token.TotalSupply -= _value;
@@ -64,7 +65,7 @@ func (token *Token) burnFrom(_from string, _value int) {
 }
 
 func (token *Token) mint(_value int) {
-	if(token) return
+	if(token.Lock) return
 	token.BalanceOf[token.Owner] += _value;
 	token.TotalSupply += _value;
 	
@@ -90,7 +91,11 @@ type Account struct {
 type SmartContract struct {
 }
 
-func (s *SmartContract) Init(stub shim.ChaincodeStubInterface) pb.Response {
+func (s *SmartContract) Init(stub shim.ChaincodeStubInterface) sc.Response {
+	return shim.Success(nil)
+}
+
+func (s *SmartContract) initLedger(stub shim.ChaincodeStubInterface, args []string) sc.Response {
 
 	if len(args) != 3 {
 		return shim.Error("Incorrect number of arguments. Expecting 2")
@@ -297,7 +302,9 @@ func (s *SmartContract) Invoke(stub shim.ChaincodeStubInterface) pb.Response {
 	// Retrieve the requested Smart Contract function and arguments
 	function, args := stub.GetFunctionAndParameters()
 	// Route to the appropriate handler function to interact with the ledger appropriately
-	if function == "setLock" {
+	if function == "initLedger" {
+		return s.initLedger(stub, args)
+	} else if function == "setLock" {
 		return s.setLock(stub, args)
 	} else if function == "transferToken" {
 		return s.transferToken(stub, args)
