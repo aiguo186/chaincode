@@ -102,7 +102,7 @@ func (token *Token) mint(_currency string, _amount float64, _account *Account) [
 	cur := token.Currency[_currency]
 	cur.TotalSupply += _amount;
 	token.Currency[_currency] = cur
-	_account.BalanceOf[_currency] = _amount;
+	_account.BalanceOf[_currency] += _amount;
 
 	msg := &Msg{Status: true, Code: 0, Message: "代币增发成功"}
 	rev, _ := json.Marshal(msg)
