@@ -264,7 +264,6 @@ func (s *SmartContract) showToken(stub shim.ChaincodeStubInterface, args []strin
 	return shim.Success(tokenAsBytes)
 }
 
-
 func (s *SmartContract) initCurrency(stub shim.ChaincodeStubInterface, args []string) pb.Response {
 	if len(args) != 3 {
 		return shim.Error("Incorrect number of arguments. Expecting 3")
@@ -318,13 +317,13 @@ func (s *SmartContract) initCurrency(stub shim.ChaincodeStubInterface, args []st
 
 func (s *SmartContract) transferToken(stub shim.ChaincodeStubInterface, args []string) pb.Response {
 
-	if len(args) != 5 {
-		return shim.Error("Incorrect number of arguments. Expecting 5")
+	if len(args) != 4 {
+		return shim.Error("Incorrect number of arguments. Expecting 4")
 	}
-	_from 		:= args[1]
-	_to			:= args[2]
-	_currency 	:= args[3]
-	_amount,_	:= strconv.ParseFloat(args[4], 32)
+	_from 		:= args[0]
+	_to			:= args[1]
+	_currency 	:= args[2]
+	_amount,_	:= strconv.ParseFloat(args[3], 32)
 	
 	if(_amount <= 0){
 		return shim.Error("Incorrect number of amount")
@@ -473,7 +472,7 @@ func (s *SmartContract) setLock(stub shim.ChaincodeStubInterface, args []string)
 }
 func (s *SmartContract) frozenAccount(stub shim.ChaincodeStubInterface, args []string) pb.Response {
 	
-	if len(args) != 3 {
+	if len(args) != 2 {
 		return shim.Error("Incorrect number of arguments. Expecting 2")
 	}
 
@@ -486,7 +485,7 @@ func (s *SmartContract) frozenAccount(stub shim.ChaincodeStubInterface, args []s
 	}
 	// fmt.Printf("setLock - begin %s \n", string(tokenAsBytes))
 
-	account := &Account{}
+	account := Account{}
 
 	json.Unmarshal(accountAsBytes, &account)
 
