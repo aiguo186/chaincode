@@ -222,12 +222,9 @@ func (s *SmartContract) createAccount(stub shim.ChaincodeStubInterface, args []s
 
 	key  := args[0]
 	name  := args[0]
-
 	existAsBytes,err := stub.GetState(key)
+	fmt.Printf("GetState(%s) %s \n", key, string(existAsBytes))
 	if existAsBytes != nil {
-		return shim.Error("Failed to create account, Duplicate key.")
-	}
-	if err == nil {
 		fmt.Println("Failed to create account, Duplicate key.")
 		return shim.Error("Failed to create account, Duplicate key.")
 	}
