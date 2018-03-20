@@ -230,12 +230,12 @@ func (s *SmartContract) createAccount(stub shim.ChaincodeStubInterface, args []s
 	name  := args[0]
 	existAsBytes,err := stub.GetState(key)
 	fmt.Printf("GetState(%s) %s \n", key, string(existAsBytes))
-	if existAsBytes != nil {
+	if string(existAsBytes) != "" {
 		fmt.Println("Failed to create account, Duplicate key.")
 		return shim.Error("Failed to create account, Duplicate key.")
 	}
 
-	account := &Account{
+	account := Account{
 		Name: name,
 		Frozen: false,
 		BalanceOf: map[string]float64{}}
@@ -273,7 +273,7 @@ func (s *SmartContract) initCurrency(stub shim.ChaincodeStubInterface, args []st
 
 	// json.Unmarshal(coinbaseAsBytes, &coinbase)
 
-	token := &Token{}
+	token := Token{}
 	existAsBytes,err := stub.GetState(TokenKey)
 	if err != nil {
 		return shim.Error(err.Error())
@@ -532,7 +532,7 @@ func (s *SmartContract) balance(stub shim.ChaincodeStubInterface, args []string)
 		fmt.Printf("Account balance %s \n", string(accountAsBytes))
 	}
 
-	account := &Account{}
+	account := Account{}
 	json.Unmarshal(accountAsBytes, &account)
 	result := account.balance(_currency)
 
@@ -556,7 +556,7 @@ func (s *SmartContract) balanceAll(stub shim.ChaincodeStubInterface, args []stri
 		fmt.Printf("Account balance %s \n", string(accountAsBytes))
 	}
 
-	account := &Account{}
+	account := Account{}
 	json.Unmarshal(accountAsBytes, &account)
 	result := account.balanceAll()
 	resultAsBytes, _ := json.Marshal(result)
