@@ -72,11 +72,11 @@ func (token *Token) transfer (_from *Account, _to *Account, _currency string, _v
 	
 }
 func (token *Token) initialSupply(_name string, _symbol string, _supply float64){
-	if _,ok := token.Currency[_symbol]; ok {
-		return
-	}else{
+	//if _,ok := token.Currency[_symbol]; ok {
+	//	return
+	//}else{
 		token.Currency[_symbol] = Currency{TokenName: _name, TokenSymbol: _symbol, TotalSupply: _supply}
-	}
+	//}
 	
 /*
 	if _account.BalanceOf[_symbol] > 0 {
@@ -215,6 +215,8 @@ func (s *SmartContract) Invoke(stub shim.ChaincodeStubInterface) pb.Response {
 		return s.balanceAll(stub, args)
 	} else if function == "showAccount" {
 		return s.showAccount(stub, args)
+	} else if function == "showToken" {
+		return s.showToken(stub, args)
 	}
 
 	return shim.Error("Invalid Smart Contract function name.")
@@ -252,6 +254,16 @@ func (s *SmartContract) createAccount(stub shim.ChaincodeStubInterface, args []s
 func (s *SmartContract) initLedger(stub shim.ChaincodeStubInterface, args []string) pb.Response {
 	return shim.Success(nil)
 }
+func (s *SmartContract) showToken(stub shim.ChaincodeStubInterface, args []string) pb.Response {
+	tokenAsBytes,err := stub.GetState(TokenKey)
+	if err != nil {
+		return shim.Error(err.Error())
+	}else{
+		fmt.Printf("GetState(%s)) %s \n", TokenKey, string(tokenAsBytes))
+	}
+	return shim.Success(tokenAsBytes)
+}
+
 
 func (s *SmartContract) initCurrency(stub shim.ChaincodeStubInterface, args []string) pb.Response {
 	if len(args) != 3 {
