@@ -71,10 +71,10 @@ func (token *Token) transfer (_from *Account, _to *Account, _currency string, _v
 	}
 	
 }
-func (token *Token) initialSupply(_name string, _symbol string, _supply float64, _account *Account) []byte{
+func (token *Token) initialSupply(_name string, _symbol string, _supply float64) []byte{
 
 	token.Currency[_symbol] = Currency{TokenName: _name, TokenSymbol: _symbol, TotalSupply: _supply};
-
+/*
 	if _account.BalanceOf[_symbol] > 0 {
 		msg := &Msg{Status: false, Code: 0, Message: "账号中存在代币"}
 		rev, _ := json.Marshal(msg)
@@ -86,7 +86,7 @@ func (token *Token) initialSupply(_name string, _symbol string, _supply float64,
 		rev, _ := json.Marshal(msg)
 		return rev
 	}
-	
+*/	
 }
 
 func (token *Token) mint(_currency string, _amount float64, _account *Account) []byte{
@@ -223,6 +223,10 @@ func (s *SmartContract) createAccount(stub shim.ChaincodeStubInterface, args []s
 	if existAsBytes != nil {
 		return shim.Error("Failed to create account, Duplicate key.")
 	}
+	if err == nil {
+		fmt.Println("Failed to create account, Duplicate key.")
+		return shim.Error("Failed to create account, Duplicate key.")
+	}
 
 	account := &Account{
 		Name: name,
@@ -241,74 +245,26 @@ func (s *SmartContract) createAccount(stub shim.ChaincodeStubInterface, args []s
 func (s *SmartContract) initLedger(stub shim.ChaincodeStubInterface, args []string) pb.Response {
 	return shim.Success(nil)
 }
-/*
-func (s *SmartContract) initToken(stub shim.ChaincodeStubInterface, args []string) pb.Response {
 
-	if len(args) != 4 {
-		return shim.Error("Incorrect number of arguments. Expecting 4")
-	}
-
-	_name  := args[0]
-	_symbol:= args[1]
-	_supply,_:= strconv.ParseFloat(args[2], 64)
-	_account := args[3]
-
-	coinbaseAsBytes,err := stub.GetState(_account)
-	if err != nil {
-		return shim.Error(err.Error())
-	}
-	fmt.Printf("Coinbase before %s \n", string(coinbaseAsBytes))
-
-	coinbase := &Account{}
-
-	json.Unmarshal(coinbaseAsBytes, &coinbase)
-
-	token := &Token{Currency: map[string]Currency{}}
-	existAsBytes,err := stub.GetState(TokenKey)
-	if existAsBytes != nil {
-		json.Unmarshal(existAsBytes, &token)
-	}
-	
-	result := token.initialSupply(_name,_symbol,_supply, coinbase)
-	fmt.Printf("Init result %s \n", string(result))
-
-	tokenAsBytes, _ := json.Marshal(token)
-	err = stub.PutState(TokenKey, tokenAsBytes)
-	if err != nil {
-		return shim.Error(err.Error())
-	}
-
-	coinbaseAsBytes, _ = json.Marshal(coinbase)
-	err = stub.PutState(_account, coinbaseAsBytes)
-	if err != nil {
-		return shim.Error(err.Error())
-	}
-	fmt.Printf("Coinbase after %s \n", string(coinbaseAsBytes))
-
-	fmt.Printf("Init Token %s \n", string(tokenAsBytes))
-
-	return shim.Success(result)
-}
-*/
 func (s *SmartContract) initCurrency(stub shim.ChaincodeStubInterface, args []string) pb.Response {
-	if len(args) != 4 {
-		return shim.Error("Incorrect number of arguments. Expecting 4")
+	if len(args) != 3 {
+		return shim.Error("Incorrect number of arguments. Expecting 3")
 	}
 
 	_name  := args[0]
 	_symbol:= args[1]
 	_supply,_:= strconv.ParseFloat(args[2], 64)
-	_account := args[3]
+	// _account := args[3]
 
-	coinbaseAsBytes,err := stub.GetState(_account)
-	if err != nil {
-		return shim.Error(err.Error())
-	}
-	fmt.Printf("Coinbase before %s \n", string(coinbaseAsBytes))
+	// coinbaseAsBytes,err := stub.GetState(_account)
+	// if err != nil {
+	// 	return shim.Error(err.Error())
+	// }
+	// fmt.Printf("Coinbase before %s \n", string(coinbaseAsBytes))
 
-	coinbase := &Account{}
+	// coinbase := &Account{}
 
-	json.Unmarshal(coinbaseAsBytes, &coinbase)
+	// json.Unmarshal(coinbaseAsBytes, &coinbase)
 
 	token := &Token{}
 	existAsBytes,err := stub.GetState(TokenKey)
@@ -317,23 +273,25 @@ func (s *SmartContract) initCurrency(stub shim.ChaincodeStubInterface, args []st
 	}
 	json.Unmarshal(existAsBytes, &token)
 	
-	result := token.initialSupply(_name,_symbol,_supply, coinbase)
+	result := token.initialSupply(_name,_symbol,_supply)
 	fmt.Printf("Init result %s \n", string(result))
 
 	tokenAsBytes, _ := json.Marshal(token)
 	err = stub.PutState(TokenKey, tokenAsBytes)
 	if err != nil {
 		return shim.Error(err.Error())
+	}else{
+		fmt.Printf("Init Token %s \n", string(tokenAsBytes))
 	}
 
-	coinbaseAsBytes, _ = json.Marshal(coinbase)
-	err = stub.PutState(_account, coinbaseAsBytes)
-	if err != nil {
-		return shim.Error(err.Error())
-	}
-	fmt.Printf("Coinbase after %s \n", string(coinbaseAsBytes))
+	// coinbaseAsBytes, _ = json.Marshal(coinbase)
+	// err = stub.PutState(_account, coinbaseAsBytes)
+	// if err != nil {
+	// 	return shim.Error(err.Error())
+	// }
+	// fmt.Printf("Coinbase after %s \n", string(coinbaseAsBytes))
 
-	fmt.Printf("Init Token %s \n", string(tokenAsBytes))
+	
 
 	return shim.Success(result)
 }
