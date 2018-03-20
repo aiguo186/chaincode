@@ -209,6 +209,12 @@ func (s *SmartContract) Invoke(stub shim.ChaincodeStubInterface) pb.Response {
 		return s.frozenAccount(stub, args)
 	} else if function == "mintToken" {
 		return s.mintToken(stub, args)
+	} else if function == "balance" {
+		return s.balance(stub, args)
+	} else if function == "balanceAll" {
+		return s.balanceAll(stub, args)
+	} else if function == "showAccount" {
+		return s.showAccount(stub, args)
 	}
 
 	return shim.Error("Invalid Smart Contract function name.")
