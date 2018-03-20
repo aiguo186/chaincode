@@ -71,9 +71,9 @@ func (token *Token) transfer (_from *Account, _to *Account, _currency string, _v
 	}
 	
 }
-func (token *Token) initialSupply(_name string, _symbol string, _supply float64) []byte{
+func (token *Token) initialSupply(_name string, _symbol string, _supply float64){
 
-	token.Currency[_symbol] = Currency{TokenName: _name, TokenSymbol: _symbol, TotalSupply: _supply};
+	token.Currency[_symbol] = Currency{TokenName: _name, TokenSymbol: _symbol, TotalSupply: _supply}
 /*
 	if _account.BalanceOf[_symbol] > 0 {
 		msg := &Msg{Status: false, Code: 0, Message: "账号中存在代币"}
@@ -273,8 +273,7 @@ func (s *SmartContract) initCurrency(stub shim.ChaincodeStubInterface, args []st
 	}
 	json.Unmarshal(existAsBytes, &token)
 	
-	result := token.initialSupply(_name,_symbol,_supply)
-	fmt.Printf("Init result %s \n", string(result))
+	token.initialSupply(_name,_symbol,_supply)
 
 	tokenAsBytes, _ := json.Marshal(token)
 	err = stub.PutState(TokenKey, tokenAsBytes)
@@ -293,7 +292,7 @@ func (s *SmartContract) initCurrency(stub shim.ChaincodeStubInterface, args []st
 
 	
 
-	return shim.Success(result)
+	return shim.Success(nil)
 }
 
 func (s *SmartContract) transferToken(stub shim.ChaincodeStubInterface, args []string) pb.Response {
