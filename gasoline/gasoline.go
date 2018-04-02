@@ -7,29 +7,17 @@ Home: http://www.netkiller.cn
 Data: 2018-03-20 11:00 PM
 --------------------------------------------------
 
-CORE_PEER_ADDRESS=peer:7051 CORE_CHAINCODE_ID_NAME=token3:1.0 chaincode/token/token3
+CORE_PEER_ADDRESS=peer:7051 CORE_CHAINCODE_ID_NAME=gasoline:1.0 chaincode/token/token3
 
-peer chaincode install -n token3 -v 1.0 -p chaincodedev/chaincode/token
-peer chaincode instantiate -C myc -n token3 -v 1.0 -c '{"Args":[""]}' -P "OR ('Org1MSP.member','Org2MSP.member')"
+peer chaincode install -n gasoline -v 1.0 -p github.com/gasoline
+peer chaincode instantiate -C mychannel -n gasoline -v 1.0 -c '{"Args":[""]}' -P "OR ('Org1MSP.member','Org2MSP.member')"
 
 
-peer chaincode invoke -C myc -n token3 -c '{"function":"createAccount","Args":["coinbase"]}'
-peer chaincode invoke -C myc -n token3 -v 1.0 -c '{"function":"showAccount","Args":["coinbase"]}'
-peer chaincode invoke -C myc -n token3 -c '{"function":"balanceAll","Args":["coinbase"]}'
-
-peer chaincode invoke -C myc -n token3 -c '{"function":"initCurrency","Args":["Netkiller Token","NKC","1000000","coinbase"]}'
-peer chaincode invoke -C myc -n token3 -c '{"function":"initCurrency","Args":["NEO Token","NEC","1000000","coinbase"]}'
-
-peer chaincode invoke -C myc -n token3 -c '{"function":"setLock","Args":["true"]}'
-peer chaincode invoke -C myc -n token3 -c '{"function":"setLock","Args":["false"]}'
-
-peer chaincode invoke -C myc -n token3 -c '{"function":"mintToken","Args":["NKC","5000","coinbase"]}'
-
-peer chaincode invoke -C myc -n token3 -c '{"function":"createAccount","Args":["netkiller"]}'
-peer chaincode invoke -C myc -n token3 -c '{"function":"transferToken","Args":["coinbase","netkiller","NKC","100"]}'		
-peer chaincode invoke -C myc -n token3 -c '{"function":"balance","Args":["netkiller","NKC"]}'
-
-peer chaincode invoke -C myc -n token3 -c '{"function":"frozenAccount","Args":["netkiller","true"]}'
+peer chaincode invoke -C mychannel -n gasoline -c '{"function":"initial","Args":["1000000","100","Neo 初始化数据"]}'
+peer chaincode invoke -C mychannel -n gasoline -c '{"function":"show","Args":[]}'
+peer chaincode invoke -C mychannel -n gasoline -c '{"function":"activate","Args":["激活数据"]}'
+peer chaincode invoke -C mychannel -n gasoline -c '{"function":"recharge","Args":["充值数据"]}'
+peer chaincode invoke -C mychannel -n gasoline -c '{"function":"discard","Args":["废弃数据"]}'
 
 --------------------------------------------------
 
@@ -117,7 +105,7 @@ func (s *SmartContract) Init(stub shim.ChaincodeStubInterface) pb.Response {
 }
 
 func (s *SmartContract) Query(stub shim.ChaincodeStubInterface) pb.Response {
-	return shim.Error("Invalid Smart Contract function name.")
+	return shim.Success(nil)
 }
 
 func (s *SmartContract) Invoke(stub shim.ChaincodeStubInterface) pb.Response {
@@ -133,7 +121,7 @@ func (s *SmartContract) Invoke(stub shim.ChaincodeStubInterface) pb.Response {
 		return s.rechargeGasoline(stub, args)
 	} else if function == "discard" {
 		return s.discardGasoline(stub, args)
-	} else {
+	} else if function == "show" {
 		return s.showGasoline(stub, args)
 	}
 
