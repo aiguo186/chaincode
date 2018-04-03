@@ -31,15 +31,15 @@ peer chaincode invoke -C myc -n gasoline -c '{"function":"discard","Args":["1000
 	+----------+    +-----------+    +-----------+    
 	| New      | -> | Activated | -> | Recharged |
 	+----------+    +-----------+    +-----------+    
-		 |                |
-		 V                |
+		 |            |
+		 V            |
 	+----------+          |
-    | Discard  | <--------+
+        | Discard  | <--------+
 	+----------+
          |
          V
 	+----------+ 
-    | Delete   |
+        | Delete   |
 	+----------+ 
 */
 
@@ -56,13 +56,15 @@ import (
 type Gasoline struct {
 	Number 			string	`json:"Number"`
 	Amount			float64	`json:"Amount"`
+	Password		string  `json:"Password"`
 	Status 			string	`json:"Status"`
 	Message 		map[string]string	`json:"Message"`
 }
 
-func (gasoline *Gasoline) initial(_number string, _amount float64,_msg string){
+func (gasoline *Gasoline) initial(_number string, _amount float64, _password string, _msg string){
 	gasoline.Number 	= _number
 	gasoline.Amount 	= _amount
+	gasoline.Password	= _password
 	gasoline.Status		= "New"
 	gasoline.Message	= map[string]string{gasoline.Status : _msg}
 }
@@ -137,14 +139,15 @@ func (s *SmartContract) Invoke(stub shim.ChaincodeStubInterface) pb.Response {
 
 func (s *SmartContract) initialGasoline(stub shim.ChaincodeStubInterface, args []string) pb.Response {
 
-	if len(args) != 4 {
-		return shim.Error("Incorrect number of arguments. Expecting 4")
+	if len(args) != 5 {
+		return shim.Error("Incorrect number of arguments. Expecting 5")
 	}
 
 	_key  	:= args[0]
 	_number := args[1]
 	_amount,_:= strconv.ParseFloat(args[2], 64)
-	_message:= args[3]
+	_password:= args[3]
+	_message:= args[4]
 
 	if(_amount <= 0){
 		return shim.Error("Incorrect number of amount")
@@ -157,8 +160,8 @@ func (s *SmartContract) initialGasoline(stub shim.ChaincodeStubInterface, args [
 		return shim.Error("Failed to create account, Duplicate key.")
 	}
 
-	gasoline := &Gasoline{}
-	gasoline.initial(_number, _amount, _message)
+	gasoline := Gasoline{}
+	gasoline.initial(_number, _amount, _password, _message)
 
 	gasolineAsBytes, _ := json.Marshal(gasoline)
 	err = stub.PutState(_key, gasolineAsBytes)
@@ -183,6 +186,12 @@ func (s *SmartContract) showGasoline(stub shim.ChaincodeStubInterface, args []st
 	}else{
 		fmt.Printf("showGasoline %s \n", string(gasolineAsBytes))
 	}
+	gasoline := Gasoline{}
+	json.Unmarshal(gasolineAsBytes, &gasoline)
+	if gasoline.Status == "New" {
+		gasoline.Password = ""
+	} 
+	gasolineAsBytes, err = json.Marshal(gasoline)
 	return shim.Success(gasolineAsBytes)
 }
 
@@ -210,7 +219,7 @@ func (s *SmartContract) activateGasoline(stub shim.ChaincodeStubInterface, args 
 	if err != nil {
 		return shim.Error(err.Error())
 	}
-	fmt.Printf("activateGasoline - end %s \n", string(gasolineAsBytes))
+	fmt.Printf("activateGasoline %s \n", string(gasolineAsBytes))
 	
 	return shim.Success(gasolineAsBytes)
 }
