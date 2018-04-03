@@ -191,6 +191,9 @@ func (s *SmartContract) showGasoline(stub shim.ChaincodeStubInterface, args []st
 	if gasoline.Status == "New" {
 		gasoline.Password = ""
 	} 
+	if(gasoline.Status == "Discard"){
+		gasoline.Password = ""
+	}
 	gasolineAsBytes, err = json.Marshal(gasoline)
 	return shim.Success(gasolineAsBytes)
 }
@@ -248,7 +251,7 @@ func (s *SmartContract) rechargeGasoline(stub shim.ChaincodeStubInterface, args 
 	if err != nil {
 		return shim.Error(err.Error())
 	}
-	fmt.Printf("rechargeGasoline - end %s \n", string(gasolineAsBytes))
+	fmt.Printf("rechargeGasoline %s \n", string(gasolineAsBytes))
 	
 	return shim.Success(gasolineAsBytes)
 }
@@ -277,7 +280,7 @@ func (s *SmartContract) discardGasoline(stub shim.ChaincodeStubInterface, args [
 	if err != nil {
 		return shim.Error(err.Error())
 	}
-	fmt.Printf("discardGasoline - end %s \n", string(gasolineAsBytes))
+	fmt.Printf("discardGasoline %s \n", string(gasolineAsBytes))
 	
 	return shim.Success(gasolineAsBytes)
 }
