@@ -16,16 +16,21 @@ peer chaincode invoke -C mychannel -n gasoline -c '{"function":"recharge","Args"
 peer chaincode invoke -C mychannel -n gasoline -c '{"function":"discard","Args":["废弃数据"]}'
 
 --------------------------------------------------
+CORE_PEER_ADDRESS=peer:7051 CORE_CHAINCODE_ID_NAME=gasoline:1.0 ./gasoline
 
-CORE_PEER_ADDRESS=peer:7051 CORE_CHAINCODE_ID_NAME=gasoline:1.0 chaincode/gasoline/gasoline
+peer chaincode install -n gasoline -v 1.0 -p chaincodedev/chaincode/gasoline
 
 peer chaincode instantiate -C myc -n gasoline -v 1.0 -c '{"Args":[]}'
+peer chaincode invoke -C myc -n gasoline -c '{"function":"initial","Args":["uuid1","1000000","100","password","Neo 初始化数据"]}'
+peer chaincode invoke -C myc -n gasoline -c '{"function":"show","Args":["uuid1"]}'
+peer chaincode invoke -C myc -n gasoline -c '{"function":"activate","Args":["uuid1","激活数据"]}'
+peer chaincode invoke -C myc -n gasoline -c '{"function":"recharge","Args":["uuid1","充值数据"]}'
+peer chaincode invoke -C myc -n gasoline -c '{"function":"discard","Args":["uuid1","废弃数据"]}'
 
-peer chaincode invoke -C myc -n gasoline -c '{"function":"initial","Args":["1000000","100","Neo 初始化数据"]}'
-peer chaincode invoke -C myc -n gasoline -c '{"function":"show","Args":[]}'
-peer chaincode invoke -C myc -n gasoline -c '{"function":"activate","Args":["1000000","激活数据"]}'
-peer chaincode invoke -C myc -n gasoline -c '{"function":"recharge","Args":["1000000","充值数据"]}'
-peer chaincode invoke -C myc -n gasoline -c '{"function":"discard","Args":["1000000","废弃数据"]}'
+CORE_PEER_ADDRESS=peer:7051 CORE_CHAINCODE_ID_NAME=gasoline:1.1 ./gasoline
+peer chaincode install -n gasoline -v 1.1 -p chaincodedev/chaincode/gasoline
+peer chaincode upgrade -C myc -n gasoline -v 1.1 -c '{"Args":[]}'
+
 --------------------------------------------------
 
 	+----------+    +-----------+    +-----------+    
