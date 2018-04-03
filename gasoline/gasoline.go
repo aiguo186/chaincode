@@ -154,7 +154,6 @@ func (s *SmartContract) initialGasoline(stub shim.ChaincodeStubInterface, args [
 	}
 
 	existAsBytes,err := stub.GetState(_key)
-	fmt.Printf("GetState(%s) %s \n", _key, string(existAsBytes))
 	if string(existAsBytes) != "" {
 		fmt.Println("Failed to create account, Duplicate key.")
 		return shim.Error("Failed to create account, Duplicate key.")
@@ -168,7 +167,7 @@ func (s *SmartContract) initialGasoline(stub shim.ChaincodeStubInterface, args [
 	if err != nil {
 		return shim.Error(err.Error())
 	}
-	fmt.Printf("initialGasoline %s \n", string(gasolineAsBytes))
+	fmt.Printf("initialGasoline %s %s \n", _key, string(gasolineAsBytes))
 
 	return shim.Success(gasolineAsBytes)
 }
@@ -181,6 +180,9 @@ func (s *SmartContract) showGasoline(stub shim.ChaincodeStubInterface, args []st
 	_key 	:= args[0]
 
 	gasolineAsBytes,err := stub.GetState(_key)
+	if string(gasolineAsBytes) == "" {
+		return shim.Error("The key isn't exist.")
+	}
 	if err != nil {
 		return shim.Error(err.Error())
 	}else{
@@ -207,6 +209,10 @@ func (s *SmartContract) activateGasoline(stub shim.ChaincodeStubInterface, args 
 	_msg 	:= args[1]
 
 	gasolineAsBytes,err := stub.GetState(_key)
+	if string(gasolineAsBytes) == "" {
+                return shim.Error("The key isn't exist.")
+        }
+
 	if err != nil {
 		return shim.Error(err.Error())
 	}else{
@@ -236,6 +242,9 @@ func (s *SmartContract) rechargeGasoline(stub shim.ChaincodeStubInterface, args 
 	_msg 	:= args[1]
 
 	gasolineAsBytes,err := stub.GetState(_key)
+	if string(gasolineAsBytes) == "" {
+                return shim.Error("The key isn't exist.")
+        }
 	if err != nil {
 		return shim.Error(err.Error())
 	}else{
@@ -265,6 +274,9 @@ func (s *SmartContract) discardGasoline(stub shim.ChaincodeStubInterface, args [
 	_msg 	:= args[1]
 
 	gasolineAsBytes,err := stub.GetState(_key)
+	if string(gasolineAsBytes) == "" {
+                return shim.Error("The key isn't exist.")
+        }
 	if err != nil {
 		return shim.Error(err.Error())
 	}else{
@@ -293,6 +305,9 @@ func (s *SmartContract) deleteGasoline(stub shim.ChaincodeStubInterface, args []
 	_key 	:= args[0]
 
 	gasolineAsBytes,err := stub.GetState(_key)
+	if string(gasolineAsBytes) == "" {
+                return shim.Error("The key isn't exist.")
+        }
 	if err != nil {
 		return shim.Error(err.Error())
 	}else{
