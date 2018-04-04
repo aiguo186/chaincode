@@ -137,6 +137,8 @@ func (s *SmartContract) Invoke(stub shim.ChaincodeStubInterface) pb.Response {
 		return s.discardGasoline(stub, args)
 	} else if function == "show" {
 		return s.showGasoline(stub, args)
+	} else if function == "delete" {
+		return s.deleteGasoline(stub, args)
 	}
 
 	return shim.Error("Invalid Smart Contract function name.")
