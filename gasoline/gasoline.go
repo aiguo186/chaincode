@@ -60,15 +60,15 @@ import (
 
 type Gasoline struct {
 	Number 			string	`json:"Number"`
-	Amount			float64	`json:"Amount"`
+	Price			float64	`json:"Price"`
 	Password		string  `json:"Password"`
 	Status 			string	`json:"Status"`
 	Message 		map[string]string	`json:"Message"`
 }
 
-func (gasoline *Gasoline) initial(_number string, _amount float64, _password string, _msg string){
+func (gasoline *Gasoline) initial(_number string, _price float64, _password string, _msg string){
 	gasoline.Number 	= _number
-	gasoline.Amount 	= _amount
+	gasoline.Amount 	= _price
 	gasoline.Password	= _password
 	gasoline.Status		= "New"
 	gasoline.Message	= map[string]string{gasoline.Status : _msg}
@@ -152,12 +152,12 @@ func (s *SmartContract) initialGasoline(stub shim.ChaincodeStubInterface, args [
 
 	_key  	:= args[0]
 	_number := args[1]
-	_amount,_:= strconv.ParseFloat(args[2], 64)
+	_price,_:= strconv.ParseFloat(args[2], 64)
 	_password:= args[3]
 	_message:= args[4]
 
-	if(_amount <= 0){
-		return shim.Error("Incorrect number of amount")
+	if(_price <= 0){
+		return shim.Error("Incorrect number of price")
 	}
 
 	existAsBytes,err := stub.GetState(_key)
@@ -167,7 +167,7 @@ func (s *SmartContract) initialGasoline(stub shim.ChaincodeStubInterface, args [
 	}
 
 	gasoline := Gasoline{}
-	gasoline.initial(_number, _amount, _password, _message)
+	gasoline.initial(_number, _price, _password, _message)
 
 	gasolineAsBytes, _ := json.Marshal(gasoline)
 	err = stub.PutState(_key, gasolineAsBytes)
