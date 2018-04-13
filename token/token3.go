@@ -305,8 +305,11 @@ func (s *SmartContract) initCurrency(stub shim.ChaincodeStubInterface, args []st
 	if err != nil {
 		return shim.Error(err.Error())
 	}
-	fmt.Printf("Coinbase before %s \n", string(coinbaseAsBytes))
-
+	if coinbaseAsBytes == nil {
+		return shim.Error("Account not found")
+	}else{
+		fmt.Printf("Coinbase before %s \n", string(coinbaseAsBytes))
+	}
 	coinbase := &Account{}
 
 	json.Unmarshal(coinbaseAsBytes, &coinbase)
@@ -360,7 +363,11 @@ func (s *SmartContract) transferToken(stub shim.ChaincodeStubInterface, args []s
 	if err != nil {
 		return shim.Error(err.Error())
 	}
-	fmt.Printf("fromAccount %s \n", string(fromAsBytes))
+	if fromAsBytes == nil {
+		return shim.Error("Account not found - From")
+	}else{
+		fmt.Printf("fromAccount %s \n", string(fromAsBytes))
+	}
 	fromAccount := &Account{}
 	json.Unmarshal(fromAsBytes, &fromAccount)
 
@@ -368,7 +375,11 @@ func (s *SmartContract) transferToken(stub shim.ChaincodeStubInterface, args []s
 	if err != nil {
 		return shim.Error(err.Error())
 	}
-	fmt.Printf("toAccount %s \n", string(toAsBytes))
+	if toAsBytes == nil {
+		return shim.Error("Account not found - To")
+	}else{
+		fmt.Printf("toAccount %s \n", string(toAsBytes))
+	}
 	toAccount := &Account{}
 	json.Unmarshal(toAsBytes, &toAccount)
 
@@ -376,7 +387,11 @@ func (s *SmartContract) transferToken(stub shim.ChaincodeStubInterface, args []s
 	if err != nil {
 		return shim.Error(err.Error())
 	}
-	fmt.Printf("Token %s \n", string(toAsBytes))
+	if tokenAsBytes == nil {
+		return shim.Error("Token not found")
+	}else{
+		fmt.Printf("Token %s \n", string(toAsBytes))
+	}
 	token := Token{Currency: map[string]Currency{}}
 	json.Unmarshal(tokenAsBytes, &token)
 
@@ -419,6 +434,9 @@ func (s *SmartContract) mintToken(stub shim.ChaincodeStubInterface, args []strin
 	coinbaseAsBytes,err := stub.GetState(_account)
 	if err != nil {
 		return shim.Error(err.Error())
+	}
+	if coinbaseAsBytes == nil {
+		return shim.Error("Coinbase Account not found")
 	}else{
 		fmt.Printf("Coinbase before %s \n", string(coinbaseAsBytes))
 	}
@@ -430,8 +448,11 @@ func (s *SmartContract) mintToken(stub shim.ChaincodeStubInterface, args []strin
 	if err != nil {
 		return shim.Error(err.Error())
 	}
-	fmt.Printf("Token before %s \n", string(tokenAsBytes))
-
+	if tokenAsBytes == nil {
+		return shim.Error("Token not found")
+	}else{
+		fmt.Printf("Token before %s \n", string(tokenAsBytes))
+	}
 	token := Token{}
 
 	json.Unmarshal(tokenAsBytes, &token)
@@ -473,6 +494,9 @@ func (s *SmartContract) setLock(stub shim.ChaincodeStubInterface, args []string)
 	if err != nil {
 		return shim.Error(err.Error())
 	}
+	if tokenAsBytes == nil {
+		return shim.Error("Token not found")
+	}
 	// fmt.Printf("setLock - begin %s \n", string(tokenAsBytes))
 
 	token := Token{}
@@ -509,6 +533,9 @@ func (s *SmartContract) frozenAccount(stub shim.ChaincodeStubInterface, args []s
 	accountAsBytes,err := stub.GetState(_account)
 	if err != nil {
 		return shim.Error(err.Error())
+	}
+	if accountAsBytes == nil {
+		return shim.Error("Account not found")
 	}
 	// fmt.Printf("setLock - begin %s \n", string(tokenAsBytes))
 
@@ -549,6 +576,9 @@ func (s *SmartContract) showAccount(stub shim.ChaincodeStubInterface, args []str
 	accountAsBytes,err := stub.GetState(_account)
 	if err != nil {
 		return shim.Error(err.Error())
+	}
+	if accountAsBytes == nil {
+		return shim.Error("Account not found")
 	}else{
 		fmt.Printf("Account balance %s \n", string(accountAsBytes))
 	}
@@ -566,6 +596,9 @@ func (s *SmartContract) balance(stub shim.ChaincodeStubInterface, args []string)
 	accountAsBytes,err := stub.GetState(_account)
 	if err != nil {
 		return shim.Error(err.Error())
+	}
+	if accountAsBytes == nil {
+		return shim.Error("Account not found")
 	}else{
 		fmt.Printf("Account balance %s \n", string(accountAsBytes))
 	}
@@ -590,6 +623,9 @@ func (s *SmartContract) balanceAll(stub shim.ChaincodeStubInterface, args []stri
 	accountAsBytes,err := stub.GetState(_account)
 	if err != nil {
 		return shim.Error(err.Error())
+	}
+	if accountAsBytes == nil {
+		return shim.Error("Account not found")
 	}else{
 		fmt.Printf("Account balance %s \n", string(accountAsBytes))
 	}
