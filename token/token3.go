@@ -142,7 +142,7 @@ func (token *Token) burn(_currency string, _amount float64, _account *Account) [
 		rev, _ := json.Marshal(msg)
 		return rev
 	}
-	if(token.Currency[_currency].TotalSupply >= _amount){
+	if(token.Currency[_currency].TotalSupply >= _amount && _account.BalanceOf[_currency] >= _amount){
 		cur := token.Currency[_currency]
 		cur.TotalSupply -= _amount;
 		token.Currency[_currency] = cur
