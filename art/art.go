@@ -59,7 +59,7 @@ func (s *SmartContract) create(stub shim.ChaincodeStubInterface, args []string) 
 	}
 	fmt.Printf("create %s %s \n", _key, string(_data))
 
-	return shim.Success([]byte(_data))
+	return shim.Success(nil)
 }
 
 func (s *SmartContract) find(stub shim.ChaincodeStubInterface, args []string) pb.Response {
@@ -102,7 +102,7 @@ func (s *SmartContract) update(stub shim.ChaincodeStubInterface, args []string) 
 		fmt.Printf("update %s %s \n", _key, string(_data))
 	}
 	
-	return shim.Success([]byte(_data))
+	return shim.Success(nil)
 }
 
 // Deletes an entity from state
