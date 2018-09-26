@@ -23,8 +23,8 @@ func (s *SmartContract) Invoke(stub shim.ChaincodeStubInterface) pb.Response {
 	// Route to the appropriate handler function to interact with the ledger appropriately
 	if function == "create" {
 		return s.create(stub, args)
-	} else if function == "find" {
-		return s.find(stub, args)
+	} else if function == "query" {
+		return s.query(stub, args)
 	} else if function == "update" {
 		return s.update(stub, args)
 	} else if function == "delete" {
@@ -62,7 +62,7 @@ func (s *SmartContract) create(stub shim.ChaincodeStubInterface, args []string) 
 	return shim.Success(nil)
 }
 
-func (s *SmartContract) find(stub shim.ChaincodeStubInterface, args []string) pb.Response {
+func (s *SmartContract) query(stub shim.ChaincodeStubInterface, args []string) pb.Response {
 
 	if len(args) != 1 {
 		return shim.Error("Incorrect number of arguments. Expecting 1")
