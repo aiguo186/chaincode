@@ -9,12 +9,14 @@ import (
 type SmartContract struct {}
 
 func (s *SmartContract) Init(stub shim.ChaincodeStubInterface) pb.Response {
+	args := stub.GetStringArgs()
+	s.create(stub, args)
 	return shim.Success(nil)
 }
 
-func (s *SmartContract) Query(stub shim.ChaincodeStubInterface) pb.Response {
-	return shim.Success(nil)
-}
+// func (s *SmartContract) Query(stub shim.ChaincodeStubInterface) pb.Response {
+// 	return shim.Success(nil)
+// }
 
 func (s *SmartContract) Invoke(stub shim.ChaincodeStubInterface) pb.Response {
 
